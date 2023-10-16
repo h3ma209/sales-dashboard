@@ -12,12 +12,14 @@
     "antd": "^5.10.0",
     "next": "13.5.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-highlight-words": "^0.20.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-highlight-words": "^0.16.5",
     "autoprefixer": "^10",
     "postcss": "^8",
     "tailwindcss": "^3",
