@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { PlusCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import { Button, Input, Modal, Form, InputNumber } from "antd";
 import { Table, Space } from "antd";
@@ -7,80 +7,85 @@ import Highlighter from "react-highlight-words";
 import type { InputRef } from "antd";
 import type { ColumnType, ColumnsType } from "antd/es/table";
 import type { FilterConfirmProps } from "antd/es/table/interface";
+import { Product } from "@/app/types";
+import api, { fetchProducts } from "@/app/api";
 
-interface FoodItem {
-  name: string;
-  price: number;
-  quantity: number;
-  inventory_id: number;
-}
+// interface ProductItem {
+//   name: string;
+//   price: number;
+//   quantity: number;
+//   inventory_id: number;
+// }
 
-type DataIndex = keyof FoodItem;
+// type DataIndex = keyof ProductItem;
 
-const data: FoodItem[] = [
-  {
-    name: "Spaghetti Bolognese",
-    price: 12.99,
-    quantity: 30,
-    inventory_id: 3,
-  },
-  {
-    name: "Cheeseburger",
-    price: 8.49,
-    quantity: 40,
-    inventory_id: 4,
-  },
-  {
-    name: "Chicken Caesar Salad",
-    price: 9.99,
-    quantity: 20,
-    inventory_id: 5,
-  },
-  {
-    name: "Chocolate Cake",
-    price: 6.99,
-    quantity: 15,
-    inventory_id: 6,
-  },
-  {
-    name: "French Fries",
-    price: 3.49,
-    quantity: 50,
-    inventory_id: 7,
-  },
-  {
-    name: "Green Smoothie",
-    price: 5.99,
-    quantity: 35,
-    inventory_id: 8,
-  },
-  {
-    name: "Margarita Cocktail",
-    price: 7.99,
-    quantity: 10,
-    inventory_id: 9,
-  },
-  {
-    name: "Pepperoni Pizza",
-    price: 14.99,
-    quantity: 28,
-    inventory_id: 10,
-  },
-  {
-    name: "Chicken Tenders",
-    price: 11.49,
-    quantity: 22,
-    inventory_id: 11,
-  },
-  {
-    name: "Vegetable Sushi Roll",
-    price: 10.99,
-    quantity: 18,
-    inventory_id: 12,
-  },
-];
+// const data: ProductItem[] = [
+//   {
+//     name: "Spaghetti Bolognese",
+//     price: 12.99,
+//     quantity: 30,
+//     inventory_id: 3,
+//   },
+//   {
+//     name: "Cheeseburger",
+//     price: 8.49,
+//     quantity: 40,
+//     inventory_id: 4,
+//   },
+//   {
+//     name: "Chicken Caesar Salad",
+//     price: 9.99,
+//     quantity: 20,
+//     inventory_id: 5,
+//   },
+//   {
+//     name: "Chocolate Cake",
+//     price: 6.99,
+//     quantity: 15,
+//     inventory_id: 6,
+//   },
+//   {
+//     name: "French Fries",
+//     price: 3.49,
+//     quantity: 50,
+//     inventory_id: 7,
+//   },
+//   {
+//     name: "Green Smoothie",
+//     price: 5.99,
+//     quantity: 35,
+//     inventory_id: 8,
+//   },
+//   {
+//     name: "Margarita Cocktail",
+//     price: 7.99,
+//     quantity: 10,
+//     inventory_id: 9,
+//   },
+//   {
+//     name: "Pepperoni Pizza",
+//     price: 14.99,
+//     quantity: 28,
+//     inventory_id: 10,
+//   },
+//   {
+//     name: "Chicken Tenders",
+//     price: 11.49,
+//     quantity: 22,
+//     inventory_id: 11,
+//   },
+//   {
+//     name: "Vegetable Sushi Roll",
+//     price: 10.99,
+//     quantity: 18,
+//     inventory_id: 12,
+//   },
+// ];
+
+type DataIndex = keyof Product;
 
 export default function ProductsTableComp() {
+  const [data, setData] = useState<Product[]>([]);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
@@ -98,7 +103,7 @@ export default function ProductsTableComp() {
     form.resetFields();
   };
 
-  const handleAddFoodItem = () => {
+  const handleAddProductItem = () => {
     form
       .validateFields()
       .then((values) => {
@@ -125,9 +130,7 @@ export default function ProductsTableComp() {
     setSearchText("");
   };
 
-  const getColumnSearchProps = (
-    dataIndex: DataIndex
-  ): ColumnType<FoodItem> => ({
+  const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<Product> => ({
     filterDropdown: ({
       setSelectedKeys,
       selectedKeys,
@@ -216,7 +219,7 @@ export default function ProductsTableComp() {
       ),
   });
 
-  const columns: ColumnsType<FoodItem> = [
+  const columns: ColumnsType<Product> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -241,10 +244,17 @@ export default function ProductsTableComp() {
     },
   ];
 
+  useEffect(() => {
+    fetchProducts().then((response) => {
+      // console.log(response);
+      setData(response.data);
+    });
+  }, []);
+
   return (
     <div>
       <Button type="primary" className="bg-blue-500" onClick={showModal}>
-        Add Food Item
+        Add Product Item
       </Button>
       <Table
         pagination={{
@@ -258,20 +268,20 @@ export default function ProductsTableComp() {
         dataSource={data}
       />
       <Modal
-        title="Add Food Item"
+        title="Add Product Item"
         visible={modalVisible}
-        onOk={handleAddFoodItem}
+        onOk={handleAddProductItem}
         onCancel={handleCancel}
         okButtonProps={{ style: { backgroundColor: "#1677ff" } }}
       >
-        <Form form={form} name="addFoodItemForm">
+        <Form form={form} name="addProductItemForm">
           <Form.Item
             name="name"
             label="Name"
             rules={[
               {
                 required: true,
-                message: "Please enter the name of the food item",
+                message: "Please enter the name of the Product item",
               },
             ]}
           >

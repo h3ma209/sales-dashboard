@@ -1,40 +1,39 @@
-// foodItemsSlice.ts
-
-export interface FoodItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  inventory_id: number;
-}
-
-export interface createFoodItemPayload {
-  name: string;
-  price: number;
-  quantity: number;
-  inventory_id: number;
-}
-
-export interface updateFoodItemPayload {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  inventory_id: number;
-}
-
-export interface deleteFoodItemPayload {
-  id: number;
-}
-
-export interface FoodItemsState {
-  data: FoodItem[];
-  loading: "idle" | "pending" | "fulfilled" | "rejected";
-  error: string | null;
-}
-
-export const initialState: FoodItemsState = {
-  data: [],
-  loading: "idle",
-  error: null,
-};
+export interface Product {
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+    inventory_id: number;
+  }
+  
+  export interface createProductPayload {
+    name: string;
+    price: number;
+    quantity: number;
+    inventory_id: number;
+  }
+  
+  export interface updateProductPayload {
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+    inventory_id: number;
+  }
+  
+  export interface deleteProductPayload {
+    id: number;
+  }
+  
+  export interface ProductsState {
+    data: Product[];
+    loading: "idle" | "pending" | "fulfilled" | "rejected";
+    error: string | null;
+  }
+  
+  export const initialState: ProductsState = {
+    data: [],
+    loading: "idle",
+    error: null,
+  };
+  
