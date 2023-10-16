@@ -1,9 +1,10 @@
 "use client";
-import { SearchOutlined } from "@ant-design/icons";
-import React, { useRef, useState } from "react";
+import React, { useState, useRef } from "react";
+import { PlusCircleOutlined, SearchOutlined } from "@ant-design/icons";
+import { Button, Input, Modal, Form, InputNumber } from "antd";
+import { Table, Space } from "antd";
 import Highlighter from "react-highlight-words";
 import type { InputRef } from "antd";
-import { Button, Input, Space, Table } from "antd";
 import type { ColumnType, ColumnsType } from "antd/es/table";
 import type { FilterConfirmProps } from "antd/es/table/interface";
 
@@ -82,7 +83,32 @@ const data: FoodItem[] = [
 export default function ProductsTableComp() {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
   const searchInput = useRef<InputRef>(null);
+
+  // Add form values and form functions
+  const [form] = Form.useForm();
+
+  const showModal = () => {
+    setModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setModalVisible(false);
+    form.resetFields();
+  };
+
+  const handleAddFoodItem = () => {
+    form
+      .validateFields()
+      .then((values) => {
+        setModalVisible(false);
+        form.resetFields();
+      })
+      .catch((errorInfo) => {
+        console.log("Validation failed:", errorInfo);
+      });
+  };
 
   const handleSearch = (
     selectedKeys: string[],
@@ -98,8 +124,6 @@ export default function ProductsTableComp() {
     clearFilters();
     setSearchText("");
   };
-
-  
 
   const getColumnSearchProps = (
     dataIndex: DataIndex
@@ -218,16 +242,66 @@ export default function ProductsTableComp() {
   ];
 
   return (
-    <Table
-      pagination={{
-        position: ["topRight"],
-        pageSize: 5,
-        pageSizeOptions: ["5", "10", "20", "30", "40"],
-        showSizeChanger: true,
-      }}
-      scroll={{ y: 240 }}
-      columns={columns}
-      dataSource={data}
-    />
+    <div>
+      <Button type="primary" className="bg-blue-500" onClick={showModal}>
+        Add Food Item
+      </Button>
+      <Table
+        pagination={{
+          position: ["topLeft"],
+          pageSize: 5,
+          pageSizeOptions: ["5", "10", "20", "30", "40"],
+          showSizeChanger: true,
+        }}
+        scroll={{ y: 240 }}
+        columns={columns}
+        dataSource={data}
+      />
+      <Modal
+        title="Add Food Item"
+        visible={modalVisible}
+        onOk={handleAddFoodItem}
+        onCancel={handleCancel}
+        okButtonProps={{ style: { backgroundColor: "#1677ff" } }}
+      >
+        <Form form={form} name="addFoodItemForm">
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[
+              {
+                required: true,
+                message: "Please enter the name of the food item",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="quantity"
+            label="Quantity"
+            rules={[{ required: true, message: "Please enter the quantity" }]}
+          >
+            <InputNumber />
+          </Form.Item>
+          <Form.Item
+            name="price"
+            label="Price"
+            rules={[{ required: true, message: "Please enter the price" }]}
+          >
+            <InputNumber />
+          </Form.Item>
+          <Form.Item
+            name="inventory_id"
+            label="Inventory ID"
+            rules={[
+              { required: true, message: "Please enter the inventory ID" },
+            ]}
+          >
+            <InputNumber />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
   );
 }
